@@ -3,7 +3,9 @@ import { registerApolloClient } from '@apollo/experimental-nextjs-app-support/rs
 
 export const { getClient } = registerApolloClient(() => {
 
-  const amplifyHost = `https://pr-${process.env.AWS_BRANCH || process.env.AWS_PULL_REQUEST_ID}.${process.env.AWS_APP_ID}.amplifyapp.com`;
+  const amplifyHost = `https://${process.env.AWS_BRANCH ? process.env.AWS_BRANCH : 'pr-' + process.env.AWS_PULL_REQUEST_ID}.${process.env.AWS_APP_ID}.amplifyapp.com`;
+
+  console.log(amplifyHost)
 
   return new ApolloClient({
     cache: new InMemoryCache(),
