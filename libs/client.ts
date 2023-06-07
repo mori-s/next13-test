@@ -9,7 +9,7 @@ export const { getClient } = registerApolloClient(() => {
     cache: new InMemoryCache(),
     link: new HttpLink({
       // https://studio.apollographql.com/public/spacex-l4uc6p/
-      uri: amplifyHost
+      uri: process.env.NODE_ENV === 'production'
         ? `${amplifyHost}/api/graphql`
         : 'http://localhost:3002/api/graphql'
       // you can disable result caching here if you want to
