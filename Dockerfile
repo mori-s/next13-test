@@ -1,6 +1,6 @@
 #==================================================
 # Base Layer
-FROM node:14.17.0-slim AS base
+FROM node:16.20.0-slim AS base
 WORKDIR /app
 
 COPY package.json yarn.lock ./
@@ -18,7 +18,7 @@ RUN yarn build
 
 # ==================================================
 # Package install Layer
-FROM node:14.17.0-slim AS node_modules
+FROM node:16.20.0-slim AS node_modules
 
 WORKDIR /modules
 
@@ -27,7 +27,7 @@ RUN yarn install --non-interactive --frozen-lockfile --production
 
 # ==================================================
 # Production Run Layer
-FROM node:14.17.0-slim
+FROM node:16.20.0-slim
 ENV NODE_ENV=production
 WORKDIR /app
 
@@ -38,4 +38,4 @@ COPY --from=node_modules /modules/node_modules ./node_modules
 
 EXPOSE 8080
 
-CMD ["yarn", "start"]
+CMD ["yarn", "start", "-p", "3002"]
