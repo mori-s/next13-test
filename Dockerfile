@@ -3,7 +3,7 @@
 FROM node:16.20.0-slim AS base
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .npmrc ./
 RUN yarn --frozen-lockfile
 COPY . .
 
@@ -22,7 +22,7 @@ FROM node:16.20.0-slim AS node_modules
 
 WORKDIR /modules
 
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .npmrc ./
 RUN yarn install --non-interactive --frozen-lockfile --production
 
 # ==================================================
