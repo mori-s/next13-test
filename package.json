@@ -7,16 +7,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --require dotenv/config --config codegen.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.8.0-alpha.15",
     "@apollo/experimental-nextjs-app-support": "^0.1.0",
     "@apollo/server": "^4.7.1",
     "@as-integrations/next": "^2.0.0",
+    "@mediagene/draftjs-to-html": "^0.1.104",
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
+    "draft-js": "^0.11.7",
+    "draft.js": "^0.2.0",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
     "graphql": "^16.6.0",
@@ -33,6 +36,7 @@
     "@graphql-codegen/typescript": "^4.0.0",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
     "@graphql-codegen/typescript-resolvers": "^4.0.0",
+    "@types/draft-js": "^0.11.12",
     "apollo-datasource-rest": "^3.7.0",
     "encoding": "^0.1.13"
   }

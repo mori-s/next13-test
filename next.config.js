@@ -6,11 +6,18 @@ const nextConfig = {
         includePaths: [path.join(__dirname, 'styles')],
         additionalData: `@use "_constant.scss" as *;`,
     },
-    env: {
-        AWS_BRANCH: process.env.AWS_BRANCH,
-        AWS_APP_ID: process.env.AWS_APP_ID,
-        AWS_PULL_REQUEST_ID: process.env.AWS_PULL_REQUEST_ID
-    }
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'dev.media.loom-app.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'placehold.jp'
+            }
+        ],
+    },
 }
 
 module.exports = nextConfig

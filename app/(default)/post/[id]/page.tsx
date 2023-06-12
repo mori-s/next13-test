@@ -1,4 +1,4 @@
-import PostDetail from '@/components/Post/detail';
+import PostDetail from '@/components/Article/detail';
 import style from './page.module.scss';
 
 export default function Post({ params }: { params: { id: string } }) {

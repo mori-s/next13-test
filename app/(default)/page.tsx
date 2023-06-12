@@ -1,4 +1,4 @@
-import PostList from '@/components/Post/list';
+import PostList from '@/components/Article/list';
 import style from './page.module.scss';
 
 export default function Home() {

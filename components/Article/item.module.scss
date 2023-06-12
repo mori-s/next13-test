@@ -1,6 +1,10 @@
-.postItem {
+.articleItem {
   padding: 10px;
   @include hover(background-color);
+
+  &_info {
+    margin-left: 10px;
+  }
 
   &_title {
     @include font(xl);
@@ -16,5 +20,11 @@
 
   &:hover {
     background-color: $COLOR-GRAY-100;
+  }
+}
+
+@include mq-min {
+  .articleItem {
+    display: flex;
   }
 }

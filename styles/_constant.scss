@@ -1,3 +1,5 @@
+$PATH_IMAGE: '/images/';
+
 // ***************
 // color
 // ***************
@@ -9,6 +11,42 @@ $COLOR-GRAY-200: #e2e8f0;
 $COLOR-GRAY-300: #cbd5e1;
 $COLOR-GRAY-400: #94a3b8;
 $COLOR-GRAY-500: #64748b;
+
+// Regurar Color
+$COLOR-LIFEHACKER: #1b9b6f;
+$COLOR-WHITE: #fff;
+$COLOR-STANDARD: #202020;
+$COLOR-DARKGRAY: #454c4a;
+$COLOR-GRAY: #8c9093;
+$COLOR-LIGHTGRAY: #8c9093;
+$COLOR-BLUEGRAY: #dee5ed;
+$COLOR-PALEGRAY: #f7f7f9;
+$COLOR-LIGHTGREEN: #1b9b6f;
+$COLOR-ACCENTBLUE: #297aa3;
+$COLOR-GRAY: #8c9093;
+
+$COLOR-KEYWORDBASE: #dfebf9;
+$COLOR-KEYWORDFRAME: #bcd4f2;
+
+// theme color
+$COLOR_THEME: $COLOR-LIFEHACKER;
+$COLOR_THEME-SUB: $COLOR-LIGHTGREEN;
+// common
+$COLOR_IMAGE-HOVER: $COLOR-ACCENTBLUE;
+$COLOR_LBLOCK: $COLOR-WHITE;
+// SNS ICON
+$COLOR_ICON-RSS: #fd6700;
+$COLOR_ICON-FACEBOOK: #3b5998;
+$COLOR_ICON-TWITTER: #55acee;
+$COLOR_ICON-YOUTUBE: red;
+$COLOR_ICON-INSTAGRAM: #517fa4;
+$COLOR_ICON-LINE: #00c300;
+$COLOR_ICON-HATENA: #00a4de;
+// Logo
+$COLOR_LOGO: $COLOR_THEME;
+$COLOR_LOGO-HOVER: $COLOR_THEME-SUB;
+// Breadcrumbs
+$COLOR_BREADCRUMBS-BG: $COLOR_THEME;
 
 // ***************
 // rounded
@@ -67,6 +105,15 @@ $FONT_SIZE_BASE: 1rem;
 $FONT_GOTHIC: 'Yu Gothic', 'YuGothic', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
 $FONT_BASE: $FONT_GOTHIC;
 
+// ***************
+// font
+// ***************
+$FONT_GOTHIC: 'Yu Gothic', 'YuGothic', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+$FONT_SHARETECH: 'Share Tech', 'Yu Gothic', 'YuGothic', 'Hiragino Kaku Gothic ProN', 'Meiryo',
+  sans-serif;
+$FONT_OVERPASS: 'Overpass', 'Yu Gothic', 'YuGothic', 'Hiragino Kaku Gothic ProN', 'Meiryo',
+  sans-serif;
+
 // @param [int] $size  xs, sm, md, lg, xl, 2xl~9xlの定数で指定する
 // @param [string] $family=$FONT_GOTHIC fontの定数で指定する
 @mixin font($size: md, $family: $FONT_BASE) {
@@ -112,6 +159,19 @@ $FONT_BASE: $FONT_GOTHIC;
   }
   font-family: $family;
 }
+
+// ***************
+// SIZE
+// ***************
+$WIDTH_CONTENT: 1184px;
+$WIDTH_PRIMARY: 576px;
+$WIDTH_SECONDARY: 300px;
+$SECONDARY_ML: 40px;
+$TERTIARY_MR: 23px;
+$WIDTH_TERTIARY: 164px;
+$WIDTH_OVERALL: $WIDTH_PRIMARY + $WIDTH_SECONDARY + $SECONDARY_ML;
+$WIDTH_CONTENT-PADDING: 10px;
+$WIDTH_MARGIN: calc(calc(100% - #{$WIDTH_CONTENT}) / 2);
 
 // ***************
 // mixin

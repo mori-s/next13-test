@@ -36,6 +36,6 @@ COPY --from=build /build/public ./public
 COPY --from=build /build/.next ./.next
 COPY --from=node_modules /modules/node_modules ./node_modules
 
-EXPOSE 3002
+EXPOSE 3000
 
-CMD ["yarn", "start", "-p", "3002"]
+CMD ["yarn", "start", "-p", "3000"]
