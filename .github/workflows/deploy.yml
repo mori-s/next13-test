@@ -58,7 +58,7 @@ jobs:
       - name: Configure NPM credentials
         run: |-
           echo "mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=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" >> .npmrc
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

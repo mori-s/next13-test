@@ -2,8 +2,7 @@
 # Base Layer
 FROM node:16.20.0-slim AS base
 WORKDIR /app
-COPY .npmrc .npmrc
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .npmrc ./
 RUN yarn --frozen-lockfile
 COPY . .
 
@@ -12,7 +11,7 @@ COPY . .
 FROM base AS build
 ENV NODE_ENV=production
 WORKDIR /build
-COPY .npmrc .npmrc
+
 COPY --from=base /app ./
 RUN yarn build
 
@@ -22,7 +21,7 @@ FROM node:16.20.0-slim AS node_modules
 
 WORKDIR /modules
 
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .npmrc ./
 RUN yarn install --non-interactive --frozen-lockfile --production
 
 # ==================================================
