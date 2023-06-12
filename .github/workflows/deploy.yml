@@ -55,6 +55,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: "pull dotenv"
+        run: |-
+          echo "mediagene:registry=https://npm.pkg.github.com/ >> ~/.npmrc
+          echo //npm.pkg.github.com/:_authToken=${secrets.NPM_TOKEN} >> ~/.npmrc
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
