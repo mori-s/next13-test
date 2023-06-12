@@ -55,12 +55,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configure NPM credential
+      - name: Configure NPM credentials
         run: |-
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=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" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> .npmrc
+          echo "always-auth=true" >> .npmrc
 
-      - name: Configure AWS credential
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
