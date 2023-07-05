@@ -16,7 +16,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "next-13-demo-container",
+          "awslogs-group": "next-13-demo-task-definition",
           "awslogs-region": "ap-northeast-1",
           "awslogs-create-group": "true",
           "awslogs-stream-prefix": "next-13-demo"
