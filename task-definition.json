@@ -3,7 +3,7 @@
     "networkMode": "awsvpc",
     "containerDefinitions": [
       {
-        "name": "next-13-demo-node",
+        "name": "next-13-demo-container",
         "image": "next-13-demo",
         "portMappings": [
           {
