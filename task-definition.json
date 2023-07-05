@@ -1,28 +1,35 @@
 {
-    "family": "next-13-demo-task-definition",
-    "networkMode": "awsvpc",
-    "containerDefinitions": [
-      {
-        "name": "next-13-demo-container",
-        "image": "next-13-demo",
-        "portMappings": [
-          {
-            "containerPort": 3000,
-            "hostPort": 3000,
-            "protocol": "tcp"
-          }
-        ],
-        "essential": true
+  "family": "next-13-demo-task-definition",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "next-13-demo-container",
+      "image": "next-13-demo",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "next-13-demo-container",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-create-group": "true",
+          "awslogs-stream-prefix": "next-13-demo"
+        }
       }
-    ],
-    "runtimePlatform": {
-      "cpuArchitecture": "X86_64",
-      "operatingSystemFamily": "LINUX"
-    },
-    "requiresCompatibilities": [
-      "FARGATE"
-    ],
-    "executionRoleArn": "ecsTaskExecutionRole",
-    "cpu": "256",
-    "memory": "512"
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "requiresCompatibilities": ["FARGATE"],
+  "executionRoleArn": "ecsTaskExecutionRole",
+  "cpu": "256",
+  "memory": "512"
 }

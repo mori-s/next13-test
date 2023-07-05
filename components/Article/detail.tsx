@@ -45,7 +45,7 @@ interface ArticleProps {
 
 export default async function ArticleDetail({ id }: ArticleProps) {
   const { article } = await getArticle(id);
-  console.log(article);
+  // console.log(article);
 
   return (
     <article className={styles.articleDetail}>
