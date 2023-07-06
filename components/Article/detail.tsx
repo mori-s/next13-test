@@ -40,11 +40,12 @@ async function getArticle(slug: string) {
 }
 
 interface ArticleProps {
-  id: string;
+  slug: string;
 }
 
-export default async function ArticleDetail({ id }: ArticleProps) {
-  const { article } = await getArticle(id);
+export default async function ArticleDetail({ slug }: ArticleProps) {
+  console.log(slug);
+  const { article } = await getArticle(slug);
   // console.log(article);
 
   return (
