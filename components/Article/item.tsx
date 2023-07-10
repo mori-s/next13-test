@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import styles from './item.module.scss';
-import Thumbnail from './thumbnail';
 
 interface ArticleItemProps {
   article: {
@@ -19,7 +18,7 @@ export default function ArticleItem({ article }: ArticleItemProps) {
   return (
     <Link href={`/post/${article.slug}`}>
       <article className={styles.articleItem}>
-        <Thumbnail thumbnail={article.thumbnail} />
+        {/* <Thumbnail thumbnail={article.thumbnail} /> */}
         <div className={styles.articleItem_info}>
           <div className={styles.articleItem_title}>{article.title}</div>
         </div>

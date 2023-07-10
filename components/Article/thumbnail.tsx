@@ -16,7 +16,7 @@ export default function Thumbnail({ thumbnail }: ThumbnailProps) {
 
   return (
     <Image
-      src={src || '/images/no-image.png'}
+      src={src || ''}
       alt={thumbnail?.caption || ''}
       width={300}
       height={200}
