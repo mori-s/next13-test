@@ -2,7 +2,7 @@
 # Base Layer
 FROM node:16.20.0-slim AS base
 WORKDIR /app
-COPY package.json yarn.lock .npmrc codegen.ts .env.local ./
+COPY package.json yarn.lock .npmrc codegen.ts .env ./
 
 RUN yarn --frozen-lockfile
 COPY . .
