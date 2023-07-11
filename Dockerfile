@@ -31,7 +31,7 @@ FROM node:16.20.0-slim
 ENV NODE_ENV=production
 WORKDIR /app
 
-COPY package.json yarn.lock next.config.js ./
+COPY package.json yarn.lock next.config.js .npmrc .env ./
 COPY --from=build /build/public ./public
 COPY --from=build /build/.next ./.next
 COPY --from=node_modules /modules/node_modules ./node_modules

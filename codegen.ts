@@ -3,8 +3,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 const config: CodegenConfig = {
   schema: [
     {
-      [process.env.SCHEMA_PATH ||
-      'http://dev-minimum-1388355598.ap-northeast-1.elb.amazonaws.com:80/graph/query']: {
+      [process.env.SCHEMA_PATH || 'http://localhost:3000/api/graphql']: {
         headers: {
           'mini-api-key': process.env.MINI_API_KEY || 'YOUR-TOKEN-HERE'
         }
