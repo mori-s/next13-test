@@ -41,6 +41,8 @@ env:
   CONTAINER_NAME:
     next-13-demo-container # set this to the name of the container in the
     # containerDefinitions section of your task definition
+  PRD_BRANCH: main
+  DEV_BRANCH: develop
 
 permissions:
   contents: read
@@ -55,27 +57,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configure NPM credentials
-        run: |-
-          echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> .npmrc
-
-      - name: Configure dotenv
-        run: |-
-          echo SCHEMA_PATH=${{ secrets.SCHEMA_PATH }} >> .env
-          echo MINI_API_KEY=${{ secrets.MINI_API_KEY }} >> .env
-
+      # AWSの認証情報を設定する
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # .npmrcにNPMの認証情報を書き込む
+      - name: Configure NPM credentials
+        run: |-
+          NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
+          echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+
+      # .envにAPIのエンドポイントURLとAPIキーの情報を書き込む
+      - name: Configure dotenv
+        run: |-
+          SCHEMA_PATH=$(aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text)
+          MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text)
+          echo "SCHEMA_PATH=$SCHEMA_PATH" >> .env
+          echo "MINI_API_KEY=$MINI_API_KEY" >> .env
+
+      # ECRにログインする
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      # DockerコンテナをビルドしてECRにプッシュする
+      # コンテナイメージIDにコミットSHAをタグとして付与して一意にする
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -89,6 +100,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      # task-definition.jsonを更新する
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -97,6 +109,7 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
+      # ECSにデプロイする
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
