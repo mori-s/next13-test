@@ -65,32 +65,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Get secrets from AWS Secrets Manager
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: |
+            MINI_API_KEY
+            NPM_AUTH_TOKEN
+            arn:aws:secretsmanager:ap-northeast-1:092991348446:secret:fargate-next-13-demo-6SYO1M
+
       - id: set-secrets
         name: Generate, mask, and output a secret
         run: |
-          echo "Parameter value: $(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)"
-          NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
-          echo "npm_auth_token=$NPM_AUTH_TOKEN" >> "$GITHUB_OUTPUT"
-          echo "::add-mask::$NPM_AUTH_TOKEN"
+          echo "Parameter value: $(aws ssm get-parameters --name "/fargate-next-13-demo/schema_path" --query "Parameters[*].Value" --output text)"
           SCHEMA_PATH=$(aws ssm get-parameters --name "/fargate-next-13-demo/schema_path" --query "Parameters[*].Value" --output text)
           echo "schema_path=$SCHEMA_PATH" >> "$GITHUB_OUTPUT"
-          echo "::add-mask::$SCHEMA_PATH"
-          MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text)
-          echo "mini_api_key=$MINI_API_KEY" >> "$GITHUB_OUTPUT"
-          echo "::add-mask::$MINI_API_KEY"
 
       # .npmrcに認証情報を書き込む
       - name: Configure NPM credentials
         run: |-
-          echo "Parameter value: ${{ steps.set-secrets.outputs.npm_auth_token }}"
+          echo "Parameter value: ${{ env.MINI_API_KEY }}"
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ steps.set-secrets.outputs.npm_auth_token }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ env.NPM_AUTH_TOKEN }}" >> .npmrc
 
       # .envにAPIのエンドポイントURLとAPIキーの情報を書き込む
       - name: Configure dotenv
         run: |-
           echo "SCHEMA_PATH=${{ steps.set-secrets.outputs.schema_path }}" >> .env
-          echo "MINI_API_KEY=${{ steps.set-secrets.outputs.mini_api_key }}" >> .env
+          echo "MINI_API_KEY=${{ env.NPM_AUTH_TOKEN }}" >> .env
 
       # ECRにログインする
       - name: Login to Amazon ECR
