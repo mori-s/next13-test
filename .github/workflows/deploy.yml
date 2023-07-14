@@ -68,13 +68,13 @@ jobs:
       - id: set-secrets
         name: Generate, mask, and output a secret
         run: |
-          NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
+          NPM_AUTH_TOKEN=$((aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text))
           echo "::add-mask::$NPM_AUTH_TOKEN"
           echo "npm_auth_token=$NPM_AUTH_TOKEN" >> "$GITHUB_OUTPUT"
-          SCHEMA_PATH=$(aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text)
+          SCHEMA_PATH=$((aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text))
           echo "::add-mask::$SCHEMA_PATH"
           echo "schema_path=$SCHEMA_PATH" >> "$GITHUB_OUTPUT"
-          MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text)
+          MINI_API_KEY=$((aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text))
           echo "::add-mask::$MINI_API_KEY"
           echo "mini_api_key=$MINI_API_KEY" >> "$GITHUB_OUTPUT"
 
