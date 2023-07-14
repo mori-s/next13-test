@@ -83,13 +83,13 @@ jobs:
       - name: Configure NPM credentials
         run: |-
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=$FARGATE_NEXT_13_DEMO_NPM_AUTH_TOKEN" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ env.FARGATE_NEXT_13_DEMO_NPM_AUTH_TOKEN }}" >> .npmrc
 
       # .envにAPIのエンドポイントURLとAPIキーの情報を書き込む
       - name: Configure dotenv
         run: |-
           echo "SCHEMA_PATH=${{ steps.set-secrets.outputs.schema_path }}" >> .env
-          echo "MINI_API_KEY=$FARGATE_NEXT_13_DEMO_MINI_API_KEY" >> .env
+          echo "MINI_API_KEY=${{ env.$FARGATE_NEXT_13_DEMO_MINI_API_KEY}}" >> .env
 
       # ECRにログインする
       - name: Login to Amazon ECR
