@@ -68,6 +68,7 @@ jobs:
       - id: set-secrets
         name: Generate, mask, and output a secret
         run: |
+          echo $(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
           NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
           echo "npm_auth_token=$NPM_AUTH_TOKEN" >> "$GITHUB_OUTPUT"
           SCHEMA_PATH=$(aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text)
@@ -79,7 +80,6 @@ jobs:
       - name: Configure NPM credentials
         run: |-
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ steps.set-secrets.outputs.npm_auth_token }}"
           echo "//npm.pkg.github.com/:_authToken=${{ steps.set-secrets.outputs.npm_auth_token }}" >> .npmrc
 
       # .envにAPIのエンドポイントURLとAPIキーの情報を書き込む
