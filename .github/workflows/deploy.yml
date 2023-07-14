@@ -68,20 +68,18 @@ jobs:
       - id: set-secrets
         name: Generate, mask, and output a secret
         run: |
-          NPM_AUTH_TOKEN=$((aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text))
-          echo "::add-mask::$NPM_AUTH_TOKEN"
+          NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
           echo "npm_auth_token=$NPM_AUTH_TOKEN" >> "$GITHUB_OUTPUT"
-          SCHEMA_PATH=$((aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text))
-          echo "::add-mask::$SCHEMA_PATH"
+          SCHEMA_PATH=$(aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text)
           echo "schema_path=$SCHEMA_PATH" >> "$GITHUB_OUTPUT"
-          MINI_API_KEY=$((aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text))
-          echo "::add-mask::$MINI_API_KEY"
+          MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text)
           echo "mini_api_key=$MINI_API_KEY" >> "$GITHUB_OUTPUT"
 
       # .npmrcにNPMの認証情報を書き込む
       - name: Configure NPM credentials
         run: |-
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ steps.set-secrets.outputs.npm_auth_token }}"
           echo "//npm.pkg.github.com/:_authToken=${{ steps.set-secrets.outputs.npm_auth_token }}" >> .npmrc
 
       # .envにAPIのエンドポイントURLとAPIキーの情報を書き込む
