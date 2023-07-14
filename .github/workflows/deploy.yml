@@ -68,18 +68,14 @@ jobs:
       # .npmrcにNPMの認証情報を書き込む
       - name: Configure NPM credentials
         run: |-
-          NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value")
-          echo $NPM_AUTH_TOKEN
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)" >> .npmrc
 
       # .envにAPIのエンドポイントURLとAPIキーの情報を書き込む
       - name: Configure dotenv
         run: |-
-          SCHEMA_PATH=$(aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value')
-          MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value")
-          echo "SCHEMA_PATH=$SCHEMA_PATH" >> .env
-          echo "MINI_API_KEY=$MINI_API_KEY" >> .env
+          echo "SCHEMA_PATH=$(aws ssm get-parameters --name '/fargate-next-13-demo/schema_path' --query 'Parameters[*].Value' --output text)" >> .env
+          echo "MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text)" >> .env
 
       # ECRにログインする
       - name: Login to Amazon ECR
