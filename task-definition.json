@@ -13,6 +13,16 @@
         }
       ],
       "essential": true,
+      "secrets": [
+        {
+          "name": "MINI_API_KEY",
+          "valueFrom": "/fargate-next-13-demo/mini_api_key"
+        },
+        {
+          "name": "SCHEMA_PATH",
+          "valueFrom": "/fargate-next-13-demo/schema_path"
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
