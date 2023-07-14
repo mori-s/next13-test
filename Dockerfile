@@ -3,7 +3,6 @@
 FROM node:16.20.0-slim AS base
 WORKDIR /app
 COPY package.json yarn.lock .npmrc codegen.ts .env ./
-RUN cat .npmrc
 
 RUN yarn --frozen-lockfile
 COPY . .
