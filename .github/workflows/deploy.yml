@@ -72,6 +72,7 @@ jobs:
             MINI_API_KEY
             NPM_AUTH_TOKEN
             arn:aws:secretsmanager:ap-northeast-1:092991348446:secret:fargate-next-13-demo-6SYO1M
+          parse-json-secrets: true
 
       - id: set-secrets
         name: Generate, mask, and output a secret
@@ -83,7 +84,7 @@ jobs:
       # .npmrcに認証情報を書き込む
       - name: Configure NPM credentials
         run: |-
-          echo "Parameter value: ${{ env.MINI_API_KEY }}"
+          echo "Parameter value: ${{ env.NPM_AUTH_TOKEN }}"
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ env.NPM_AUTH_TOKEN }}" >> .npmrc
 
