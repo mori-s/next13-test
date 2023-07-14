@@ -68,7 +68,7 @@ jobs:
       - id: set-secrets
         name: Generate, mask, and output a secret
         run: |
-          echo "$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)"
+          echo "Parameter value: $(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)"
           NPM_AUTH_TOKEN=$(aws ssm get-parameters --name "/fargate-next-13-demo/npm_auth_token" --with-decryption --query "Parameters[*].Value" --output text)
           echo "npm_auth_token=$NPM_AUTH_TOKEN" >> "$GITHUB_OUTPUT"
           echo "::add-mask::$NPM_AUTH_TOKEN"
@@ -78,12 +78,11 @@ jobs:
           MINI_API_KEY=$(aws ssm get-parameters --name "/fargate-next-13-demo/mini_api_key" --with-decryption --query "Parameters[*].Value" --output text)
           echo "mini_api_key=$MINI_API_KEY" >> "$GITHUB_OUTPUT"
           echo "::add-mask::$MINI_API_KEY"
-        env:
-          ACTIONS_RUNNER_DEBUG: true
 
       # .npmrcにNPMの認証情報を書き込む
       - name: Configure NPM credentials
         run: |-
+          echo "Parameter value: ${{ steps.set-secrets.outputs.npm_auth_token }}"
           echo "@mediagene:registry=https://npm.pkg.github.com/" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ steps.set-secrets.outputs.npm_auth_token }}" >> .npmrc
 
