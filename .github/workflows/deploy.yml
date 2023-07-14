@@ -79,7 +79,7 @@ jobs:
           echo "mini_api_key=$MINI_API_KEY" >> "$GITHUB_OUTPUT"
           echo "::add-mask::$MINI_API_KEY"
 
-      # .npmrcにNPMの認証情報を書き込む
+      # .npmrcに認証情報を書き込む
       - name: Configure NPM credentials
         run: |-
           echo "Parameter value: ${{ steps.set-secrets.outputs.npm_auth_token }}"
