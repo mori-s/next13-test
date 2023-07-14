@@ -89,7 +89,7 @@ jobs:
       - name: Configure dotenv
         run: |-
           echo "SCHEMA_PATH=${{ steps.set-secrets.outputs.schema_path }}" >> .env
-          echo "MINI_API_KEY=${{ env.$FARGATE_NEXT_13_DEMO_MINI_API_KEY}}" >> .env
+          echo "MINI_API_KEY=${{ env.FARGATE_NEXT_13_DEMO_MINI_API_KEY }}" >> .env
 
       # ECRにログインする
       - name: Login to Amazon ECR
