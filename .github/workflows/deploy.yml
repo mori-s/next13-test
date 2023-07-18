@@ -66,6 +66,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       # AWS Systems Managerのパラメータストアからシークレット情報を取得する
+      # 各シークレットはGITHUB_OUTPUTに書き込んで後続のステップで参照できるようにする
       - id: set-secrets
         name: Generate, mask, and output a secret
         run: |
