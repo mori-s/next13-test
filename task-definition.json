@@ -16,11 +16,11 @@
       "secrets": [
         {
           "name": "MINI_API_KEY",
-          "valueFrom": "/fargate-next-13-demo/mini_api_key"
+          "valueFrom": "arn:aws:ssm:ap-northeast-1:092991348446:parameter/fargate-next-13-demo/mini_api_key"
         },
         {
           "name": "SCHEMA_PATH",
-          "valueFrom": "/fargate-next-13-demo/schema_path"
+          "valueFrom": "arn:aws:ssm:ap-northeast-1:092991348446:parameter/fargate-next-13-demo/schema_path"
         }
       ],
       "logConfiguration": {
