@@ -40,6 +40,7 @@
     "operatingSystemFamily": "LINUX"
   },
   "requiresCompatibilities": ["FARGATE"],
+  "ExecutionRoleArn": "arn:aws:iam::092991348446:role/AmazonECSTaskExecutionPlamerterStoreRole",
   "taskRoleArn": "arn:aws:iam::092991348446:role/AmazonECSTaskParameterStoreRole",
   "executionRoleArn": "ecsTaskExecutionRole",
   "cpu": "256",
