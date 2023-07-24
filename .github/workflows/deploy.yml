@@ -216,7 +216,6 @@ jobs:
       # Listener Ruleを作成する
       - name: Create Listener Rule
         id: create-listener-rule
-        if: ${{ github.event_name == 'pull_request' && steps.check-exist-listener-rule.outputs.check_exits == 'false' }}
         run: |
           HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
 
@@ -241,7 +240,6 @@ jobs:
       # DNSレコードを追加する
       - name: Add DNS record
         id: add-dns-record
-        if: ${{ github.event_name == 'pull_request' }}
         run: |
           HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
 
@@ -250,7 +248,7 @@ jobs:
             --query "HostedZones[0].Id" \
             --output text)
 
-          LB_HOSTED_ZONE_ID==$(aws elbv2 describe-load-balancers \
+          LB_HOSTED_ZONE_ID=$(aws elbv2 describe-load-balancers \
             --names ${{ env.LOAD_BALANCER_NAME }} \
             --query 'LoadBalancers[0].CanonicalHostedZoneId' \
             --output text)
