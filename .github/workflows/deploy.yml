@@ -64,6 +64,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Configure short sha
+        id: short_sha
+        run: echo "value=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       # AWSの認証情報を設定する
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -121,7 +125,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.short_sha.outputs.value }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
@@ -144,8 +148,8 @@ jobs:
         id: check-exist-target-group
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          HOST_HEADER="pr-${{ github.sha }}-next-13-demo.${{ env.HOST_DOMAIN }}"
-          TARGET_GROUP_NAME="${{ env.ECS_SERVICE }}-pr-${{ github.sha }}"
+          HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
+          TARGET_GROUP_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
           TARGET_GROUP_ARN=$(aws elbv2 describe-target-groups \
             --names $TARGET_GROUP_NAME \
             --query "TargetGroups[*].TargetGroupArn" \
@@ -193,7 +197,7 @@ jobs:
             --query "Listeners[*].ListenerArn" \
             --output text)
 
-          HOST_HEADER="pr-${{ github.sha }}-next-13-demo.${{ env.HOST_DOMAIN }}"
+          HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
           LISTENER_RULE_ARN=$(aws elbv2 describe-rules \
             --listener-arn $LISTENER_ARN | grep -w $HOST_HEADER \
             --query "Rules[].RuleArn" \
@@ -266,7 +270,7 @@ jobs:
         id: check-exist-service
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          SERVICE_NAME="${{ env.ECS_SERVICE }}-pr-${{ github.sha }}"
+          SERVICE_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
           SERVICE_ARN=$(aws ecs describe-services \
             --cluster ${{ env.ECS_CLUSTER }} \
             --services $SERVICE_NAME \
