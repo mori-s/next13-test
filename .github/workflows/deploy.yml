@@ -179,33 +179,32 @@ jobs:
             --output text)" >> $GITHUB_OUTPUT
 
       # Listener Ruleが存在するかチェックする
-      - run:
-          name: Check exist ELB Listener rule
-          id: check-exist-listener-rule
-          if: ${{ github.event_name == 'pull_request' }}
-          run: |
-            LOAD_BALANCER_ARN = $(aws elbv2 describe-load-balancers \
-              --names ${{ env.LOAD_BALANCER_NAME }} \
-              --query 'LoadBalancers[0].LoadBalancerArn' \
-              --output text)
+      - name: Check exist ELB Listener rule
+        id: check-exist-listener-rule
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          LOAD_BALANCER_ARN = $(aws elbv2 describe-load-balancers \
+            --names ${{ env.LOAD_BALANCER_NAME }} \
+            --query 'LoadBalancers[0].LoadBalancerArn' \
+            --output text)
 
-            LISTENER_ARN = $(aws elbv2 describe-listeners \
-              --load-balancer-arn $LOAD_BALANCER_ARN \
-              --query "Listeners[*].ListenerArn" \
-              --output text)
+          LISTENER_ARN = $(aws elbv2 describe-listeners \
+            --load-balancer-arn $LOAD_BALANCER_ARN \
+            --query "Listeners[*].ListenerArn" \
+            --output text)
 
-            HOST_HEADER="pr-${{ github.sha }}-next-13-demo.${{ env.HOST_DOMAIN }}"
-            LISTENER_RULE_ARN=$(aws elbv2 describe-rules \
-              --listener-arn $LISTENER_ARN | grep -w $HOST_HEADER \
-              --query "Rules[].RuleArn" \
-              --output text)
+          HOST_HEADER="pr-${{ github.sha }}-next-13-demo.${{ env.HOST_DOMAIN }}"
+          LISTENER_RULE_ARN=$(aws elbv2 describe-rules \
+            --listener-arn $LISTENER_ARN | grep -w $HOST_HEADER \
+            --query "Rules[].RuleArn" \
+            --output text)
 
-            if [ -z "$LISTENER_RULE_ARN" ]; then
-              echo "check_exits=false" >> $GITHUB_OUTPUT
-              echo "host_header=$HOST_HEADER" >> $GITHUB_OUTPUT
-            else
-              echo "Listener rule $LISTENER_RULE_ARN is already exist."
-            fi
+          if [ -z "$LISTENER_RULE_ARN" ]; then
+            echo "check_exits=false" >> $GITHUB_OUTPUT
+            echo "host_header=$HOST_HEADER" >> $GITHUB_OUTPUT
+          else
+            echo "Listener rule $LISTENER_RULE_ARN is already exist."
+          fi
 
       # Listener Ruleを作成する
       - name: Create Listener Rule
