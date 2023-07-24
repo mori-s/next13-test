@@ -219,12 +219,12 @@ jobs:
         run: |
           HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
 
-          LOAD_BALANCER_ARN = $(aws elbv2 describe-load-balancers \
+          LOAD_BALANCER_ARN=$(aws elbv2 describe-load-balancers \
             --names ${{ env.LOAD_BALANCER_NAME }} \
             --query 'LoadBalancers[0].LoadBalancerArn' \
             --output text)
 
-          LISTENER_ARN = $(aws elbv2 describe-listeners \
+          LISTENER_ARN=$(aws elbv2 describe-listeners \
             --load-balancer-arn $LOAD_BALANCER_ARN \
             --query "Listeners[*].ListenerArn" \
             --output text)
