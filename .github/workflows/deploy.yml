@@ -253,6 +253,11 @@ jobs:
             --query 'LoadBalancers[0].CanonicalHostedZoneId' \
             --output text)
 
+          LB_DNS_NAME=$(aws elbv2 describe-load-balancers \
+            --names ${{ env.LOAD_BALANCER_NAME }} \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text)
+
           aws route53 change-resource-record-sets \
             --hosted-zone-id $HOSTED_ZONE_ID \
             --change-batch "{
@@ -263,7 +268,7 @@ jobs:
                   \"Type\": \"A\",
                   \"AliasTarget\": {
                     \"HostedZoneId\": \"$LB_HOSTED_ZONE_ID\",
-                    \"DNSName\": \"$HOST_HEADER\",
+                    \"DNSName\": \"$LB_DNS_NAME\",
                     \"EvaluateTargetHealth\": false
                   }
                 }
