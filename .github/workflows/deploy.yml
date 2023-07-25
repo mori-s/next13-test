@@ -33,6 +33,9 @@ on:
 env:
   AWS_REGION: ap-northeast-1 # set this to your preferred AWS region, e.g. us-west-1
   AWS_VPC_NAME: next-13-demo-vpc # set this to your Amazon VPC name
+  AWS_SG_NAME_1: default # set this to your Amazon Security Group name
+  AWS_SG_NAME_2: next-13-demo-alb-sg # set this to your Amazon Security Group name
+  AWS_SG_NAME_3: next-13-demo-sg-2 # set this to your Amazon Security Group name
   ECR_REPOSITORY: next-13-demo # set this to your Amazon ECR repository name
   ECS_SERVICE: next-13-demo-service # set this to your Amazon ECS service name
   ECS_CLUSTER: next-13-demo # set this to your Amazon ECS cluster name
@@ -142,6 +145,38 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
+
+      # Serviceを作成する
+      - name: Create service
+        id: create-service
+        run: |
+          SERVICE_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
+          echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+
+          VPC_ID=$(aws ec2 describe-vpcs \
+            --filters "Name=tag:Name,Values=${{ env.AWS_VPC_NAME }}" \
+            --query "Vpcs[0].VpcId" \
+            --output text)
+
+          SUBNET_IDS=$(aws ec2 describe-subnets \
+            --filters "Name=vpc-id,Values=$VPC_ID" \
+            --query 'join(`,`, Subnets[*].SubnetId)' \
+            --output text)
+
+          SG_IDS=$(aws ec2 describe-security-groups \
+            --filters "Name=vpc-id,Values=$VPC_ID" \
+            --query 'join(`,`, SecurityGroups[*].GroupId)' \
+            --output text)
+
+          echo "service_arn=$(aws ecs create-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service-name $SERVICE_NAME \
+            --task-definition ${{ steps.task-def.outputs.task-definition }} \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_IDS],assignPublicIp=ENABLED}" \
+            --region ${env.AWS_REGION} \
+            --output text)" >> $GITHUB_OUTPUT
 
       # Target Groupが存在するかチェックする
       # - name: Check exist Target Group
@@ -276,31 +311,31 @@ jobs:
             }"
 
       # Serviceが存在するかチェックする
-      - name: Check exist service
-        id: check-exist-service
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          SERVICE_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
-          echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
-        #   SERVICE_ARN=$(aws ecs describe-services \
-        #     --cluster ${{ env.ECS_CLUSTER }} \
-        #     --services $SERVICE_NAME \
-        #     --query "services[*].serviceArn" \
-        #     --output text)
+      # - name: Check exist service
+      #   id: check-exist-service
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   run: |
+      #     SERVICE_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
+      #     echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+      #   SERVICE_ARN=$(aws ecs describe-services \
+      #     --cluster ${{ env.ECS_CLUSTER }} \
+      #     --services $SERVICE_NAME \
+      #     --query "services[*].serviceArn" \
+      #     --output text)
 
-        #   if [ -z "$SERVICE_ARN" ]; then
-        #     echo "check_exits=false" >> $GITHUB_OUTPUT
-        #     echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
-        #   else
-        #     echo "Service $SERVICE_NAME is already exist."
-        #   fi
-        # continue-on-error: true
+      #   if [ -z "$SERVICE_ARN" ]; then
+      #     echo "check_exits=false" >> $GITHUB_OUTPUT
+      #     echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+      #   else
+      #     echo "Service $SERVICE_NAME is already exist."
+      #   fi
+      # continue-on-error: true
 
       # ECSにデプロイする
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ steps.check-exist-service.outputs.service_name }}
+          service: ${{ steps.create-service.outputs.service_name }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
