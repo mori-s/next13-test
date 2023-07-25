@@ -175,140 +175,90 @@ jobs:
             --desired-count 1 \
             --launch-type FARGATE \
             --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_IDS],assignPublicIp=ENABLED}" \
-            --region ${env.AWS_REGION} \
+            --region ${{ env.AWS_REGION }} \
             --output text)" >> $GITHUB_OUTPUT
-
-      # Target Groupが存在するかチェックする
-      # - name: Check exist Target Group
-      #   id: check-exist-target-group
-      #   if: ${{ github.event_name == 'pull_request' }}
-      #   run: |
-      #     HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
-      #     TARGET_GROUP_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
-      #     TARGET_GROUP_ARN=$(aws elbv2 describe-target-groups \
-      #       --names $TARGET_GROUP_NAME \
-      #       --query "TargetGroups[*].TargetGroupArn" \
-      #       --output text) exit_code=$?
-
-      #     if [ $exit_code -eq 254 ]; then
-      #       echo "check_exits=false" >> $GITHUB_OUTPUT
-      #       echo "host_header=$HOST_HEADER" >> $GITHUB_OUTPUT
-      #       echo "target_group_name=$TARGET_GROUP_NAME" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "Target group $TARGET_GROUP_NAME is already exist."
-      #     fi
-      #   continue-on-error: true
 
       # Target Groupを作成する
-      - name: Create Target Group
-        id: create-target-group
-        run: |
-          TARGET_GROUP_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
-
-          VPC_ID=$(aws ec2 describe-vpcs \
-            --filters "Name=tag:Name,Values=${{ env.AWS_VPC_NAME }}" \
-            --query "Vpcs[0].VpcId" \
-            --output text)
-
-          echo "target_group_arn=$(aws elbv2 create-target-group \
-            --name $TARGET_GROUP_NAME \
-            --protocol HTTP \
-            --port 80 \
-            --target-type ip \
-            --vpc-id $VPC_ID \
-            --query "TargetGroups[*].TargetGroupArn" \
-            --output text)" >> $GITHUB_OUTPUT
-
-      # Listener Ruleが存在するかチェックする
-      # - name: Check exist ELB Listener rule
-      #   id: check-exist-listener-rule
-      #   if: ${{ github.event_name == 'pull_request' }}
+      # - name: Create Target Group
+      #   id: create-target-group
       #   run: |
-      #     LOAD_BALANCER_ARN = $(aws elbv2 describe-load-balancers \
+      #     TARGET_GROUP_NAME="${{ env.ECS_SERVICE }}-pr-${{ steps.short_sha.outputs.value }}"
+
+      #     VPC_ID=$(aws ec2 describe-vpcs \
+      #       --filters "Name=tag:Name,Values=${{ env.AWS_VPC_NAME }}" \
+      #       --query "Vpcs[0].VpcId" \
+      #       --output text)
+
+      #     echo "target_group_arn=$(aws elbv2 create-target-group \
+      #       --name $TARGET_GROUP_NAME \
+      #       --protocol HTTP \
+      #       --port 80 \
+      #       --target-type ip \
+      #       --vpc-id $VPC_ID \
+      #       --query "TargetGroups[*].TargetGroupArn" \
+      #       --output text)" >> $GITHUB_OUTPUT
+
+      # Listener Ruleを作成する
+      # - name: Create Listener Rule
+      #   id: create-listener-rule
+      #   run: |
+      #     HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
+
+      #     LOAD_BALANCER_ARN=$(aws elbv2 describe-load-balancers \
       #       --names ${{ env.LOAD_BALANCER_NAME }} \
       #       --query 'LoadBalancers[0].LoadBalancerArn' \
       #       --output text)
 
-      #     LISTENER_ARN = $(aws elbv2 describe-listeners \
+      #     LISTENER_ARN=$(aws elbv2 describe-listeners \
       #       --load-balancer-arn $LOAD_BALANCER_ARN \
       #       --query "Listeners[*].ListenerArn" \
       #       --output text)
 
-      #     HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
-      #     LISTENER_RULE_ARN=$(aws elbv2 describe-rules \
-      #       --listener-arn $LISTENER_ARN | grep -w $HOST_HEADER \
+      #     echo "listener_rule_arn=$(aws elbv2 create-rule \
+      #       --listener-arn $LISTENER_ARN \
+      #       --priority 50000 \
+      #       --conditions Field=host-header,Values=$HOST_HEADER \
+      #       --actions Type=forward,TargetGroupArn=${{ steps.create-target-group.outputs.target_group_arn }} \
       #       --query "Rules[].RuleArn" \
-      #       --output text)
-
-      #     if [ -z "$LISTENER_RULE_ARN" ]; then
-      #       echo "check_exits=false" >> $GITHUB_OUTPUT
-      #       echo "host_header=$HOST_HEADER" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "Listener rule $LISTENER_RULE_ARN is already exist."
-      #     fi
-      #   continue-on-error: true
-
-      # Listener Ruleを作成する
-      - name: Create Listener Rule
-        id: create-listener-rule
-        run: |
-          HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
-
-          LOAD_BALANCER_ARN=$(aws elbv2 describe-load-balancers \
-            --names ${{ env.LOAD_BALANCER_NAME }} \
-            --query 'LoadBalancers[0].LoadBalancerArn' \
-            --output text)
-
-          LISTENER_ARN=$(aws elbv2 describe-listeners \
-            --load-balancer-arn $LOAD_BALANCER_ARN \
-            --query "Listeners[*].ListenerArn" \
-            --output text)
-
-          echo "listener_rule_arn=$(aws elbv2 create-rule \
-            --listener-arn $LISTENER_ARN \
-            --priority 50000 \
-            --conditions Field=host-header,Values=$HOST_HEADER \
-            --actions Type=forward,TargetGroupArn=${{ steps.create-target-group.outputs.target_group_arn }} \
-            --query "Rules[].RuleArn" \
-            --output text)" >> $GITHUB_OUTPUT
+      #       --output text)" >> $GITHUB_OUTPUT
 
       # DNSレコードを追加する
-      - name: Add DNS record
-        id: add-dns-record
-        run: |
-          HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
+      # - name: Add DNS record
+      #   id: add-dns-record
+      #   run: |
+      #     HOST_HEADER="pr-${{ steps.short_sha.outputs.value }}-next-13-demo.${{ env.HOST_DOMAIN }}"
 
-          HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name \
-            --dns-name ${{ env.HOST_DOMAIN }} \
-            --query "HostedZones[0].Id" \
-            --output text)
+      #     HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name \
+      #       --dns-name ${{ env.HOST_DOMAIN }} \
+      #       --query "HostedZones[0].Id" \
+      #       --output text)
 
-          LB_HOSTED_ZONE_ID=$(aws elbv2 describe-load-balancers \
-            --names ${{ env.LOAD_BALANCER_NAME }} \
-            --query 'LoadBalancers[0].CanonicalHostedZoneId' \
-            --output text)
+      #     LB_HOSTED_ZONE_ID=$(aws elbv2 describe-load-balancers \
+      #       --names ${{ env.LOAD_BALANCER_NAME }} \
+      #       --query 'LoadBalancers[0].CanonicalHostedZoneId' \
+      #       --output text)
 
-          LB_DNS_NAME=$(aws elbv2 describe-load-balancers \
-            --names ${{ env.LOAD_BALANCER_NAME }} \
-            --query 'LoadBalancers[0].DNSName' \
-            --output text)
+      #     LB_DNS_NAME=$(aws elbv2 describe-load-balancers \
+      #       --names ${{ env.LOAD_BALANCER_NAME }} \
+      #       --query 'LoadBalancers[0].DNSName' \
+      #       --output text)
 
-          aws route53 change-resource-record-sets \
-            --hosted-zone-id $HOSTED_ZONE_ID \
-            --change-batch "{
-              \"Changes\": [{
-                \"Action\": \"CREATE\",
-                \"ResourceRecordSet\": {
-                  \"Name\": \"$HOST_HEADER\",
-                  \"Type\": \"A\",
-                  \"AliasTarget\": {
-                    \"HostedZoneId\": \"$LB_HOSTED_ZONE_ID\",
-                    \"DNSName\": \"$LB_DNS_NAME\",
-                    \"EvaluateTargetHealth\": false
-                  }
-                }
-              }]
-            }"
+      #     aws route53 change-resource-record-sets \
+      #       --hosted-zone-id $HOSTED_ZONE_ID \
+      #       --change-batch "{
+      #         \"Changes\": [{
+      #           \"Action\": \"CREATE\",
+      #           \"ResourceRecordSet\": {
+      #             \"Name\": \"$HOST_HEADER\",
+      #             \"Type\": \"A\",
+      #             \"AliasTarget\": {
+      #               \"HostedZoneId\": \"$LB_HOSTED_ZONE_ID\",
+      #               \"DNSName\": \"$LB_DNS_NAME\",
+      #               \"EvaluateTargetHealth\": false
+      #             }
+      #           }
+      #         }]
+      #       }"
 
       # Serviceが存在するかチェックする
       # - name: Check exist service
@@ -332,10 +282,10 @@ jobs:
       # continue-on-error: true
 
       # ECSにデプロイする
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ steps.create-service.outputs.service_name }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+      # - name: Deploy Amazon ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: ${{ steps.create-service.outputs.service_name }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
