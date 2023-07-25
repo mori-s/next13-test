@@ -168,15 +168,15 @@ jobs:
             --query 'join(`,`, SecurityGroups[*].GroupId)' \
             --output text)
 
-          echo "service_arn=$(aws ecs create-service \
+          aws ecs create-service \
             --cluster ${{ env.ECS_CLUSTER }} \
             --service-name $SERVICE_NAME \
-            --task-definition ${{ steps.task-def.outputs.task-definition }} \
+            --task-definition next-13-demo-task-definition \
             --desired-count 1 \
             --launch-type FARGATE \
             --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_IDS],assignPublicIp=ENABLED}" \
             --region ${{ env.AWS_REGION }} \
-            --output text)" >> $GITHUB_OUTPUT
+            --output text
 
       # Target Groupを作成する
       - name: Create Target Group
